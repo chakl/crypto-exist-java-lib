@@ -8,7 +8,6 @@ import javax.annotation.Nullable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.exist.util.io.FastByteArrayOutputStream;
 import org.exist.xquery.XPathException;
 import org.exist.xquery.value.BinaryValue;
 import org.exist.xquery.value.IntegerValue;
@@ -17,6 +16,8 @@ import org.exist.xquery.value.Sequence;
 import org.exist.xquery.value.SequenceIterator;
 import org.exist.xquery.value.Type;
 import org.exist.xquery.value.ValueSequence;
+
+import org.apache.commons.io.output.UnsynchronizedByteArrayOutputStream;
 
 import com.evolvedbinary.j8fu.Either;
 
@@ -36,7 +37,7 @@ public class Conversion {
 			return data.right().get();
 		} else {
 			try (final InputStream is = data.left().get();
-					final FastByteArrayOutputStream baos = new FastByteArrayOutputStream()) {
+					final UnsynchronizedByteArrayOutputStream baos = new UnsynchronizedByteArrayOutputStream()) {
 
 				final byte[] buf = new byte[Buffer.TRANSFER_SIZE];
 				int read = -1;
@@ -77,11 +78,11 @@ public class Conversion {
 				return null;
 			}
 		} else {
-			final FastByteArrayOutputStream baos = new FastByteArrayOutputStream();
+			final UnsynchronizedByteArrayOutputStream baos = new UnsynchronizedByteArrayOutputStream();
 			for (final SequenceIterator iterator = sequence.iterate(); iterator.hasNext();) {
 				baos.write(((NumericValue) iterator.nextItem()).getInt());
 			}
-			return Either.Left(baos.toFastByteInputStream());
+			return Either.Left(baos.toInputStream());
 		}
 	}
 
